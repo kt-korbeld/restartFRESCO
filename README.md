@@ -25,10 +25,10 @@ It only appends the output files used by the DistributeRosetta/Foldx Phase2 scri
 The addition at the end is also done by the python script. The bash script simply calls the python script to do this once the calculations have finished. 
 If the calculations finish but this last appending step goes wrong, you can manually run this part of the script using:
 ```
-python restartFresco.py Phase2 fx
+python restartFRESCO.py Phase2 fx
 ```
 for Foldx or 
 ```
-python restartFresco.py Phase2 ro
+python restartFRESCO.py Phase2 ro
 ```
 for Rosetta.
