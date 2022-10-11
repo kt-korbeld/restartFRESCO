@@ -12,7 +12,7 @@ This should look something like this:
 python restartFRESCO.py ~/frescoSoft/foldx5mac/foldx_20221231
 ```
 
-Like FRESCO itself, the script generates a small bash script called `todolistRerun` which reruns the energy calculations for the missing mutations.
+The script generates a small bash script called `todolistRerun` which reruns the energy calculations for the missing mutations.
 This new script should be run in the background by running:
 
 ```
@@ -20,7 +20,7 @@ This new script should be run in the background by running:
 ```
 
 The script will automatically append the results of the rerun to the original output files.
-It only appends the output file used by the DistributeRosetta/Foldx Phase2 scripts, but not, in the case of Foldx, the Raw_...fxout or Pdblist_...fxout files. 
+It only appends the output files used by the DistributeRosetta/Foldx Phase2 scripts, but not, in the case of Foldx, the Raw_...fxout or Pdblist_...fxout files. 
 
 The addition at the end is also done by the python script. The bash script simply calls the python script to do this once the calculations have finished. 
 If the calculations finish but this last appending step goes wrong, you can manually run this part of the script using:
