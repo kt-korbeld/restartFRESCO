@@ -2,7 +2,7 @@
 A python script for rerunning cancelled FRESCO energy calculations. 
 
 The script makes use of the numpy library for python.
-Other than that it assumes the scripts and software required for FRESCO is properly set up. 
+Other than that it assumes the scripts and software required for FRESCO are properly set up. 
 
 The only input is the location of the executable. (This is either Foldx or Rosetta, depending on the calculations). 
 Simply copy the script into the directory where the original `todolist` script is located and run the script. 
