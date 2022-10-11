@@ -18,3 +18,13 @@ The script will automatically append the results of the rerun to the original ou
 
 It only appends the output file used by the DistributeRosetta/Foldx Phase2 scripts, but not, in the case of Foldx, for the Raw_...fxout or Pdblist_...fxout files. The script requires the numpy library to be installed, and in order for the todolistRerun script to work, python must callable with the allias 'python', which might cause an error if python is only callable with 'python3'. 
 
+The addition at the end is also done by the python script. The bash script simply calls the python script to do this once the calculations have finished. 
+If for whatever reason the calculations finish this last appending step goes wrong, you can manually this part of the script seperately using :
+```
+python restartFresco.py Phase2 fx
+```
+for Foldx or 
+```
+python restartFresco.py Phase2 ro
+```
+for Rosetta.
