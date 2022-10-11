@@ -2,6 +2,8 @@ import os, sys
 import numpy as np
 import shutil
 
+#define functions
+#---------------------------------------------------------------------------------------------------------------------------
 def ReadFile(filename):
     '''
     takes in file and returns a list
@@ -52,7 +54,7 @@ def MatchFile(directory, expressions):
             return file
     return ''
 
-
+# read input and get list of directories
 #---------------------------------------------------------------------------------------------------------------------------
 fx_or_ro = ''
 execloc = ''
@@ -77,7 +79,11 @@ CheckError(len(subdir_list) == 0, 'no directories called Subdirectory were prese
 print('found {} directories called Subdirectory'.format(len(subdir_list)))
 print('\n')
 
-#check for Phase2 before doing the rest of the script
+#initialize list of lines that will eventually be written to a new todolist script
+todolist = []
+
+#if set to Phase2, execute phase 2
+#---------------------------------------------------------------------------------------------------------------------------
 if sys.argv[1] == 'Phase2':
     for subdir in subdir_list:
         if fx_or_ro == 'fx':
@@ -113,11 +119,9 @@ if sys.argv[1] == 'Phase2':
             sys.exit()
     print('Rerun complete!')
     sys.exit()
-#initialize list of lines that will eventually be written to a new todolist script
-todolist = []
 
+#giant for loop going over each directory and setting up the files/directories for a rerun
 #---------------------------------------------------------------------------------------------------------------------------
-#most of the script is a giant for loop going over each directory and setting up the files/directories for a rerun
 for subdir in subdir_list:
 
     #read mutant file for Rosetta
@@ -254,6 +258,7 @@ for subdir in subdir_list:
     #for clarity, print whiteline between each directory
     print('\n')
 
+# writing the todolistRerun file
 #---------------------------------------------------------------------------------------------------------------------------
 print('All directories have been checked for missing mutants.')
 
