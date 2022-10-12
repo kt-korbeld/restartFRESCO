@@ -1,7 +1,7 @@
 # restartFRESCO
 A python script for rerunning cancelled FRESCO energy calculations. 
 
-The script makes use of the numpy library for python.
+The script works on Python 3.9.6 or higher, and makes use of numpy 1.23.3 or higher.
 Other than that it assumes the scripts and software required for FRESCO are properly set up. 
 
 The only input is the location of the executable. (This is either Foldx or Rosetta, depending on the calculations). 
@@ -9,7 +9,7 @@ Simply copy the script into the directory where the original `todolist` script i
 This should look something like this:
 
 ```
-python restartFRESCO.py ~/frescoSoft/foldx5mac/foldx_20221231
+python3 restartFRESCO.py ~/frescoSoft/foldx5mac/foldx_20221231
 ```
 
 The script generates a small bash script called `todolistRerun` which reruns the energy calculations for the missing mutations.
@@ -24,10 +24,10 @@ It only appends the output files used by the DistributeRosetta/Foldx Phase2 scri
 
 The appending of the original files at the end is also done by the python script. The bash script simply calls the python script to do this once the calculations have finished. If the calculations finish but this last appending step goes wrong, you can manually run this part of the script using:
 ```
-python restartFRESCO.py Phase2 fx
+python3 restartFRESCO.py Phase2 fx
 ```
 for Foldx or 
 ```
-python restartFRESCO.py Phase2 ro
+python3 restartFRESCO.py Phase2 ro
 ```
 for Rosetta.
