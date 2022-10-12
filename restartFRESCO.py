@@ -115,7 +115,7 @@ if sys.argv[1] == 'Phase2':
                 file.writelines(newout)
             print('adding missing mutants to Rosetta output file in {}'.format(subdir))
         else:
-            print('something went wrong')
+            CheckError(True, 'Neither fx or ro was specified for Phase2')
             sys.exit()
     print('Rerun complete!')
     sys.exit()
@@ -153,7 +153,7 @@ for subdir in subdir_list:
         mut_in = np.array([i.split(',')[0][0]+i.split(',')[0][2:] for i in mut_in])
     #skip directory if no mutant file exists
     else:
-        print('{} does not contain an mutant file from either Rosetta or Foldx'.format(subdir))
+        print('{} does not contain a mutant file from either Rosetta or Foldx'.format(subdir))
         print('\n')
         continue
 
