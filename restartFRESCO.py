@@ -218,9 +218,9 @@ for subdir in subdir_list:
             new_individuals = []
             for mut in missingmuts:
                 #add mutant for each subunit
-                mutformatted = [str(mut[0])+str(sub)+str(mut[1:]) for sub in subunits]
+                mutformatted = [str(mut[0])+str(sub)+str(mut[1:].replace(';', '')) for sub in subunits]
                 #join into writable string
-                mutformatted = ','.join(mutformatted)+'\n'
+                mutformatted = ','.join(mutformatted)+';\n'
                 new_individuals.append(mutformatted)
             listfile.writelines(new_individuals)
         #add lines to todolist
