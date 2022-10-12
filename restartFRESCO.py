@@ -268,7 +268,7 @@ todolist.append('while true; do\n'
                 '  if ps -p $pids > /dev/null; then\n'
                 '    sleep 60\n'
                 '  else\n'
-                '      python {0} Phase2 {1}\n'
+                '      python3 {0} Phase2 {1}\n'
                 '    break\n'
                 '  fi\n'
                 'done\n'.format(sys.argv[0], fx_or_ro))
