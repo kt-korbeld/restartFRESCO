@@ -2,8 +2,8 @@ import os, sys
 import numpy as np
 import shutil
 
-#define functions
-#---------------------------------------------------------------------------------------------------------------------------
+DEBUG = False
+
 def ReadFile(filename):
     '''
     takes in file and returns a list
@@ -54,10 +54,12 @@ def MatchFile(directory, expressions):
             return file
     return ''
 
-# read input and get list of directories
+
 #---------------------------------------------------------------------------------------------------------------------------
 fx_or_ro = ''
 execloc = ''
+reruns = 0
+CheckError(len(sys.argv) < 2, 'No arguments were given.')
 #check if set to phase2, and assign variables accordingly
 if sys.argv[1] == 'Phase2':
     fx_or_ro = sys.argv[2]
@@ -79,11 +81,7 @@ CheckError(len(subdir_list) == 0, 'no directories called Subdirectory were prese
 print('found {} directories called Subdirectory'.format(len(subdir_list)))
 print('\n')
 
-#initialize list of lines that will eventually be written to a new todolist script
-todolist = []
-
-#if set to Phase2, execute phase 2
-#---------------------------------------------------------------------------------------------------------------------------
+#check for Phase2 before doing the rest of the script
 if sys.argv[1] == 'Phase2':
     for subdir in subdir_list:
         if fx_or_ro == 'fx':
@@ -115,13 +113,15 @@ if sys.argv[1] == 'Phase2':
                 file.writelines(newout)
             print('adding missing mutants to Rosetta output file in {}'.format(subdir))
         else:
-            CheckError(True, 'Neither fx or ro was specified for Phase2')
+            print('something went wrong')
             sys.exit()
     print('Rerun complete!')
     sys.exit()
+#initialize list of lines that will eventually be written to a new todolist script
+todolist = []
 
-#giant for loop going over each directory and setting up the files/directories for a rerun
 #---------------------------------------------------------------------------------------------------------------------------
+#most of the script is a giant for loop going over each directory and setting up the files/directories for a rerun
 for subdir in subdir_list:
 
     #read mutant file for Rosetta
@@ -153,7 +153,7 @@ for subdir in subdir_list:
         mut_in = np.array([i.split(',')[0][0]+i.split(',')[0][2:] for i in mut_in])
     #skip directory if no mutant file exists
     else:
-        print('{} does not contain a mutant file from either Rosetta or Foldx'.format(subdir))
+        print('{} does not contain an mutant file from either Rosetta or Foldx'.format(subdir))
         print('\n')
         continue
 
@@ -182,7 +182,7 @@ for subdir in subdir_list:
         #skip first 9 lines for foldx output, these are header + column names
         energy_list = [i.split() for i in energy_list[9:]]
         # output file does not contain res names, so get indices from pdb names and use on mut_in
-        mut_out = mut_in[np.array([int(i[0].rsplit('_')[-1]) for i in energy_list])]
+        mut_out = mut_in[np.array([int(i[0].rsplit('_')[-1])-1 for i in energy_list])]
     #skip directory if no output files are present
     else:
         print('{} does not contain an output file from either Rosetta or Foldx'.format(subdir))
@@ -191,6 +191,10 @@ for subdir in subdir_list:
 
     #get the missing mutants by taking the set difference between muts in and out
     missingmuts = np.setdiff1d(mut_in, mut_out)
+    if DEBUG:
+        print('in:\n', mut_in)
+        print('out\n', mut_out)
+        print('missing\n,', missingmuts)
     print('Found {} mutations, of which {} have been calculated'.format(len(mut_in), len(mut_out)))
     if len(missingmuts) == 0:
         print('No missing mutations in {} have been found'.format(subdir))
@@ -198,6 +202,7 @@ for subdir in subdir_list:
         continue
     else:
         print('{} mutations are missing in {}'.format(len(missingmuts), subdir))
+        reruns+=1
 
     #create directory for rerun files
     if not os.path.exists('./{0}/Rerun{0}'.format(subdir)):
@@ -258,7 +263,6 @@ for subdir in subdir_list:
     #for clarity, print whiteline between each directory
     print('\n')
 
-# writing the todolistRerun file
 #---------------------------------------------------------------------------------------------------------------------------
 print('All directories have been checked for missing mutants.')
 
@@ -268,7 +272,7 @@ todolist.append('while true; do\n'
                 '  if ps -p $pids > /dev/null; then\n'
                 '    sleep 60\n'
                 '  else\n'
-                '      python3 {0} Phase2 {1}\n'
+                '    python {0} Phase2 {1}\n'
                 '    break\n'
                 '  fi\n'
                 'done\n'.format(sys.argv[0], fx_or_ro))
@@ -279,6 +283,7 @@ with open('./todolistRerun', 'w') as todo:
 
 os.chmod("./todolistRerun", 0o777)
 
+print('In total {} out of {} directories have missing mutants'.format(reruns, len(subdir_list)))
 print('A new script called \'todolistRerun\' has been created in order to start the missing calculations ')
 print('Run this script in the background using \'./todolistRerun &\'')
 print('After the calculations finish it will automatically add the results to the original output files')
