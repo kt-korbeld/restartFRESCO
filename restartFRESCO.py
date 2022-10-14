@@ -59,9 +59,15 @@ def MatchFile(directory, expressions):
 
 # read input and get list of directories
 #---------------------------------------------------------------------------------------------------------------------------
+
+#initializing some variables
 fx_or_ro = ''
 execloc = ''
 reruns = 0
+
+if DEBUG:
+    print(sys.argv)
+
 CheckError(len(sys.argv) < 2, 'No arguments were given.')
 #check if set to phase2, and assign variables accordingly
 if sys.argv[1] == 'Phase2':
@@ -198,6 +204,8 @@ for subdir in subdir_list:
         print('in:\n', mut_in)
         print('out\n', mut_out)
         print('missing\n,', missingmuts)
+    
+    #print some information
     print('Found {} mutations, of which {} have been calculated'.format(len(mut_in), len(mut_out)))
     if len(missingmuts) == 0:
         print('No missing mutations in {} have been found'.format(subdir))
@@ -213,7 +221,7 @@ for subdir in subdir_list:
     else:
         print('Rerun{} already exists, new files will overwrite existing files with the same name'.format(subdir))
 
-    #if foldx, copy or create all files required for a rerun
+    #if foldx, copy or create all files required for a rerun in new directory
     if fx_or_ro == 'fx':
         #read pdb name from energy list to make sure that was the one used in the previous calculation
         pdbname = energy_list[0][0].rsplit('_', 1)[0]+'.pdb'
@@ -223,21 +231,21 @@ for subdir in subdir_list:
         shutil.copy('./{0}/{1}'.format(subdir, pdbname), './{0}/Rerun{0}/{1}'.format(subdir, pdbname))
         #write out the missing mutations in the right format
         with open('./{0}/Rerun{0}/individual_list.txt'.format(subdir), 'w') as listfile:
-            new_individuals = []
+            new_individuallist = []
             for mut in missingmuts:
                 #add mutant for each subunit
-                mutformatted = [str(mut[0])+str(sub)+str(mut[1:].replace(';', '')) for sub in subunits]
+                new_muts = [str(mut[0])+str(sub)+str(mut[1:].replace(';', '')) for sub in subunits]
                 #join into writable string
-                mutformatted = ','.join(mutformatted)+';\n'
-                new_individuals.append(mutformatted)
-            listfile.writelines(new_individuals)
+                new_muts = ','.join(new_muts)+';\n'
+                new_individuallist.append(new_muts)
+            listfile.writelines(new_individuallist)
         #add lines to todolist
         todolist.append('cd {0}/Rerun{0}/\n'.format(subdir))
         todolist.append('{0} --command=BuildModel --pdb={1}  --mutant-file=individual_list.txt '
                         '--numberOfRuns=5 > LOG&\n'.format(execloc, pdbname))
         todolist.append('cd ../..\n')
 
-    #if rosetta, copy or create all files required for a rerun
+    #if rosetta, copy or create all files required for a rerun in new directory
     if fx_or_ro == 'ro':
         #read pdb name from LOG file to make sure that was the one used in the previous calculation
         if not os.path.exists('./{0}/LOG'.format(subdir)):
