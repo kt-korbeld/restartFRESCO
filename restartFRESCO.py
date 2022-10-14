@@ -4,6 +4,9 @@ import shutil
 
 DEBUG = False
 
+#define functions
+#---------------------------------------------------------------------------------------------------------------------------
+
 def ReadFile(filename):
     '''
     takes in file and returns a list
@@ -54,7 +57,7 @@ def MatchFile(directory, expressions):
             return file
     return ''
 
-
+# read input and get list of directories
 #---------------------------------------------------------------------------------------------------------------------------
 fx_or_ro = ''
 execloc = ''
@@ -113,15 +116,15 @@ if sys.argv[1] == 'Phase2':
                 file.writelines(newout)
             print('adding missing mutants to Rosetta output file in {}'.format(subdir))
         else:
-            print('something went wrong')
-            sys.exit()
+            CheckError(True, 'Neither fx or ro was specified for Phase2')
     print('Rerun complete!')
     sys.exit()
+   
 #initialize list of lines that will eventually be written to a new todolist script
 todolist = []
 
+#giant for loop going over each directory and setting up the files/directories for a rerun
 #---------------------------------------------------------------------------------------------------------------------------
-#most of the script is a giant for loop going over each directory and setting up the files/directories for a rerun
 for subdir in subdir_list:
 
     #read mutant file for Rosetta
@@ -263,6 +266,7 @@ for subdir in subdir_list:
     #for clarity, print whiteline between each directory
     print('\n')
 
+# writing the todolistRerun file
 #---------------------------------------------------------------------------------------------------------------------------
 print('All directories have been checked for missing mutants.')
 
@@ -272,7 +276,7 @@ todolist.append('while true; do\n'
                 '  if ps -p $pids > /dev/null; then\n'
                 '    sleep 60\n'
                 '  else\n'
-                '    python {0} Phase2 {1}\n'
+                '    python3 {0} Phase2 {1}\n'
                 '    break\n'
                 '  fi\n'
                 'done\n'.format(sys.argv[0], fx_or_ro))
