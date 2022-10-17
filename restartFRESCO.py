@@ -207,7 +207,7 @@ for subdir in subdir_list:
         continue
 
     #get the missing mutants by taking the set difference between muts in and out
-    missingmuts = np.setdiff1d(mut_in, mut_out)
+    missingmuts = mut_in[~np.isin(mut_in, mut_out)]
     if DEBUG:
         print('in:\n', mut_in)
         print('out\n', mut_out)
