@@ -95,7 +95,7 @@ if sys.argv[1] == 'Phase2':
     for subdir in subdir_list:
         if fx_or_ro == 'fx':
             #read output from rerun
-            rerundir = '{0}/Rerun{0}/'.format(subdir)
+            rerundir = '{0}/Rerun{0}'.format(subdir)
             outfile = MatchFile(rerundir, ['Average', '.fxout'])
             out = ReadFile(rerundir+outfile)[9:]
             difrerun = len(ReadFile(subdir + '/' + outfile)[9:])
