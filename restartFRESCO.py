@@ -96,24 +96,25 @@ if sys.argv[1] == 'Phase2':
         if fx_or_ro == 'fx':
             # Check if a Rerun folder exists
             subdir_content = os.listdir('./{}/'.format(subdir))
-            if any('Rerun' in element for element in subdir_content):
-                #read output from rerun
-                rerundir = '{0}/Rerun{0}/'.format(subdir)
-                outfile = MatchFile(rerundir, ['Average', '.fxout'])
-                out = ReadFile(rerundir+outfile)[9:]
-                difrerun = len(ReadFile(subdir + '/' + outfile)[9:])
-                #split off filename and increase by given amount
-                newname = np.array([i.split('\t', 1)[0].rsplit('_', 1) for i in out])
-                newname[:,1] = newname[:,1].astype(int)+difrerun
-                newname = np.char.add(np.char.add(newname[:, 0], len(newname) * ['_']), newname[:, 1])
-                #split of data and combine with renamed filename
-                newdata = np.array([i.split('\t', 1)[1] for i in out])
-                newout = np.char.add(np.char.add(newname, len(newdata)*['\t']), newdata)
-                newout = np.char.add(newout, len(newout)*['\n'])
-                #write to original output file
-                with open('./{}/{}'.format(subdir, outfile), 'a') as file:
-                    file.writelines(newout)
-                print('adding missing mutants to Foldx output file in {}'.format(subdir))
+            if not any('Rerun' in element for element in subdir_content):
+                continue
+            #read output from rerun
+            rerundir = '{0}/Rerun{0}'.format(subdir)
+            outfile = MatchFile(rerundir, ['Average', '.fxout'])
+            out = ReadFile(rerundir+outfile)[9:]
+            difrerun = len(ReadFile(subdir + '/' + outfile)[9:])
+            #split off filename and increase by given amount
+            newname = np.array([i.split('\t', 1)[0].rsplit('_', 1) for i in out])
+            newname[:,1] = newname[:,1].astype(int)+difrerun
+            newname = np.char.add(np.char.add(newname[:, 0], len(newname) * ['_']), newname[:, 1])
+            #split of data and combine with renamed filename
+            newdata = np.array([i.split('\t', 1)[1] for i in out])
+            newout = np.char.add(np.char.add(newname, len(newdata)*['\t']), newdata)
+            newout = np.char.add(newout, len(newout)*['\n'])
+            #write to original output file
+            with open('./{}/{}'.format(subdir, outfile), 'a') as file:
+                file.writelines(newout)
+            print('adding missing mutants to Foldx output file in {}'.format(subdir))
         elif fx_or_ro == 'ro':
             # Check if a Rerun folder exists
             subdir_content = os.listdir('./{}/'.format(subdir))
