@@ -99,7 +99,7 @@ if sys.argv[1] == 'Phase2':
             if not any('Rerun' in element for element in subdir_content):
                 continue
             #read output from rerun
-            rerundir = '{0}/Rerun{0}'.format(subdir)
+            rerundir = '{0}/Rerun{0}/'.format(subdir)
             outfile = MatchFile(rerundir, ['Average', '.fxout'])
             out = ReadFile(rerundir+outfile)[9:]
             difrerun = len(ReadFile(subdir + '/' + outfile)[9:])
@@ -118,16 +118,17 @@ if sys.argv[1] == 'Phase2':
         elif fx_or_ro == 'ro':
             # Check if a Rerun folder exists
             subdir_content = os.listdir('./{}/'.format(subdir))
-            if any('Rerun' in element for element in subdir_content):
-                #read output from rerun
-                rerundir = '{0}/Rerun{0}/'.format(subdir)
-                outfile = 'ddg_predictions.out'
-                out = ReadFile(rerundir+outfile)[1:]
-                newout = np.char.add(out, len(out)*['\n'])
-                #write to original output file
-                with open('./{}/{}'.format(subdir, outfile), 'a') as file:
-                    file.writelines(newout)
-                print('adding missing mutants to Rosetta output file in {}'.format(subdir))
+            if not any('Rerun' in element for element in subdir_content):
+                continue
+            #read output from rerun
+            rerundir = '{0}/Rerun{0}/'.format(subdir)
+            outfile = 'ddg_predictions.out'
+            out = ReadFile(rerundir+outfile)[1:]
+            newout = np.char.add(out, len(out)*['\n'])
+            #write to original output file
+            with open('./{}/{}'.format(subdir, outfile), 'a') as file:
+                file.writelines(newout)
+            print('adding missing mutants to Rosetta output file in {}'.format(subdir))
         else:
             CheckError(True, 'Neither fx or ro was specified for Phase2')
     print('Rerun complete!')
