@@ -107,7 +107,7 @@ if sys.argv[1] == 'Phase2':
             newname = np.array([i.split('\t', 1)[0].rsplit('_', 1) for i in out])
             newname[:,1] = newname[:,1].astype(int)+difrerun
             newname = np.char.add(np.char.add(newname[:, 0], len(newname) * ['_']), newname[:, 1])
-            #split of data and combine with renamed filename
+            #combine data with renamed filename
             newdata = np.array([i.split('\t', 1)[1] for i in out])
             newout = np.char.add(np.char.add(newname, len(newdata)*['\t']), newdata)
             newout = np.char.add(newout, len(newout)*['\n'])
@@ -231,6 +231,8 @@ for subdir in subdir_list:
 
     #if foldx, copy or create all files required for a rerun in new directory
     if fx_or_ro == 'fx':
+        #make backup of original output file 
+        shutil.copy('./{0}/{1}'.format(subdir, MatchFile(subdir, ['Average', '.fxout'])), './{0}/Average_backup.fxout'.format(subdir))
         #read pdb name from energy list to make sure that was the one used in the previous calculation
         pdbname = energy_list[0][0].rsplit('_', 1)[0]+'.pdb'
         print('Found pdb in the output file: {}'.format(pdbname))
@@ -255,6 +257,8 @@ for subdir in subdir_list:
 
     #if rosetta, copy or create all files required for a rerun in new directory
     if fx_or_ro == 'ro':
+        #make backup of original output file 
+        shutil.copy('/{0}/ddg_predictions.out'.format(subdir), '/{0}/ddg_predictions_backup.out'.format(subdir))
         #read pdb name from LOG file to make sure that was the one used in the previous calculation
         if not os.path.exists('./{0}/LOG'.format(subdir)):
             print('Tried to read pdb from LOG file, but no LOG file was found')
