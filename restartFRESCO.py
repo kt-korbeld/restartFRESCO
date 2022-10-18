@@ -258,7 +258,7 @@ for subdir in subdir_list:
     #if rosetta, copy or create all files required for a rerun in new directory
     if fx_or_ro == 'ro':
         #make backup of original output file 
-        shutil.copy('/{0}/ddg_predictions.out'.format(subdir), '/{0}/ddg_predictions_backup.out'.format(subdir))
+        shutil.copy('./{0}/ddg_predictions.out'.format(subdir), './{0}/ddg_predictions_backup.out'.format(subdir))
         #read pdb name from LOG file to make sure that was the one used in the previous calculation
         if not os.path.exists('./{0}/LOG'.format(subdir)):
             print('Tried to read pdb from LOG file, but no LOG file was found')
