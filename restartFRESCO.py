@@ -2,7 +2,10 @@ import os, sys
 import numpy as np
 import shutil
 
+#set to true to get more information
 DEBUG = False
+#set to true to automatically append results to original output file
+AUTOMATIC = True
 
 #define functions
 #---------------------------------------------------------------------------------------------------------------------------
@@ -290,16 +293,9 @@ for subdir in subdir_list:
 #---------------------------------------------------------------------------------------------------------------------------
 print('All directories have been checked for missing mutants.')
 
-execname = {'fx':'foldx', 'ro':'ddg_monomer'}
-todolist.append('\npids=$(pgrep -f {})\n'.format(execname[fx_or_ro]))
-todolist.append('while true; do\n'
-                '  if ps -p $pids > /dev/null; then\n'
-                '    sleep 60\n'
-                '  else\n'
-                '    python3 {0} Phase2 {1}\n'
-                '    break\n'
-                '  fi\n'
-                'done\n'.format(sys.argv[0], fx_or_ro))
+todolist.append('wait\n')
+if AUTOMATIC:
+    todolist.append('python3 {0} Phase2 {1}\n'.format(sys.argv[0], fx_or_ro))
 
 #write everything to the new todolist script
 with open('./todolistRerun', 'w') as todo:
