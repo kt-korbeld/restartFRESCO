@@ -101,6 +101,7 @@ if sys.argv[1] == 'Phase2':
             subdir_content = os.listdir('./{}/'.format(subdir))
             if not any('Rerun' in element for element in subdir_content):
                 continue
+                
             #read output from rerun
             rerundir = '{0}/Rerun{0}/'.format(subdir)
             outfile = MatchFile(rerundir, ['Average', '.fxout'])
@@ -118,11 +119,25 @@ if sys.argv[1] == 'Phase2':
             with open('./{}/{}'.format(subdir, outfile), 'a') as file:
                 file.writelines(newout)
             print('adding missing mutants to Foldx output file in {}'.format(subdir))
+            
+            #copy all new pdbs into original directory
+            pdblist = MatchFile(rerundir, ['_', '.pdb'], givefirst=False)
+            for pdb in pdblist:
+                #split pdb name by underscore, get new name with proper count, annd move
+                splitpdb = pdb.rsplit('_', 2)
+                if len(splitpdb) >= 3:
+                    newpdb = splitpdb[0]+'_'+str(int(splitpdb[1])+difrerun)+'_'+splitpdb[2]
+                    shutil.move('{0}/{1}'.format(rerundir, pdb), '{0}/{1}'.format(subdir, newpdb))
+                    if DEBUG:
+                        print(pdb, ' renamed to ', newpdb)
+            print('moved and renamed pdb files in {}'.format(subdir))
+            
         elif fx_or_ro == 'ro':
             # Check if a Rerun folder exists
             subdir_content = os.listdir('./{}/'.format(subdir))
             if not any('Rerun' in element for element in subdir_content):
                 continue
+                
             #read output from rerun
             rerundir = '{0}/Rerun{0}/'.format(subdir)
             outfile = 'ddg_predictions.out'
@@ -157,6 +172,7 @@ for subdir in subdir_list:
         subunits = list(set([int(i) for i in mut_in if len(i) == 1]))[0]
         #get an array of mutants by taking all lines longer than 1 char and removing the whitespaces
         mut_in = np.array([i.replace(' ', '') for i in mut_in if len(i) > 1])
+    
     #read mutant file for Foldx
     elif os.path.exists('./{}/individual_list.txt'.format(subdir)):
         #check if this file should even exist and read data into list
@@ -171,12 +187,13 @@ for subdir in subdir_list:
         subunits.sort()
         #split entry for each subunit into list, only take first one, and take only resnr and amino acid.
         mut_in = np.array([i.split(',')[0][0]+i.split(',')[0][2:] for i in mut_in])
+    
     #skip directory if no mutant file exists
     else:
         print('{} does not contain an mutant file from either Rosetta or Foldx'.format(subdir))
         print('\n')
         continue
-
+    
     #Read output file for Rosetta
     if os.path.exists('./{}/ddg_predictions.out'.format(subdir)):
         #check if this file should even exist and read data into list
@@ -190,6 +207,7 @@ for subdir in subdir_list:
         energy_list = [i.split() for i in energy_list[1:] if len(i)> 1]
         #output file contains res names of calculated mutants, so take this column
         mut_out = np.array(energy_list)[:, 1]
+    
     #Read output file for Foldx'
     elif len(MatchFile(subdir, ['Average', '.fxout'])) != 0:
         #check if this file should even exist and read data into list
@@ -203,6 +221,7 @@ for subdir in subdir_list:
         energy_list = [i.split() for i in energy_list[9:]]
         # output file does not contain res names, so get indices from pdb names and use on mut_in
         mut_out = mut_in[np.array([int(i[0].rsplit('_')[-1])-1 for i in energy_list])]
+    
     #skip directory if no output files are present
     else:
         print('{} does not contain an output file from either Rosetta or Foldx'.format(subdir))
@@ -286,6 +305,7 @@ for subdir in subdir_list:
         todolist.append('{0} @FLAGrow3 -in:file:s {1} -ddg::mut_file '
                         'RosettaFormatMutations.mut >LOG&\n'.format(execloc, pdbname))
         todolist.append('cd ../..\n')
+    
     #for clarity, print whiteline between each directory
     print('\n')
 
