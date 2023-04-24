@@ -6,6 +6,9 @@ import shutil
 DEBUG = False
 #set to true to automatically append results to original output file
 AUTOMATIC = True
+#one can add additional flags to the todolist if neccesary
+FXFLAGS = []
+ROFLAGS = []
 
 #define functions
 #---------------------------------------------------------------------------------------------------------------------------
@@ -75,12 +78,14 @@ CheckError(len(sys.argv) < 2, 'No arguments were given.')
 #check if set to phase2, and assign variables accordingly
 if sys.argv[1] == 'Phase2':
     fx_or_ro = sys.argv[2]
-#if not phase2, only argument should be the directory of rosetta or foldx executable
+#if set to phase1, only argument should be the directory of rosetta or foldx executable
 elif 'foldx' in sys.argv[1].lower() and os.path.exists(sys.argv[1]):
-    execloc = sys.argv[1]
-    fx_or_ro = 'fx'
+    CheckFileExtension(sys.argv[1], ['pdb', 'ent', 'brk'])
+    execloc = sys.argv[2]
+    fx_or_ro = 'fx'  
 elif 'ddg_monomer' in sys.argv[1].lower() and os.path.exists(sys.argv[1]):
-    execloc = sys.argv[1]
+    CheckFileExtension(sys.argv[1], ['pdb', 'ent', 'brk'])
+    execloc = sys.argv[2]
     fx_or_ro = 'ro'
 else:
     CheckError(True, 'no executable for either Foldx or Rosetta was found')
@@ -255,9 +260,6 @@ for subdir in subdir_list:
     if fx_or_ro == 'fx':
         #make backup of original output file 
         shutil.copy('./{0}/{1}'.format(subdir, MatchFile(subdir, ['Average', '.fxout'])), './{0}/Average_backup.fxout'.format(subdir))
-        #read pdb name from energy list to make sure that was the one used in the previous calculation
-        pdbname = energy_list[0][0].rsplit('_', 1)[0]+'.pdb'
-        print('Found pdb in the output file: {}'.format(pdbname))
         shutil.copy('./{0}/rotabase.txt'.format(subdir), './{0}/Rerun{0}/rotabase.txt'.format(subdir))
         shutil.copy('./{0}/list.txt'.format(subdir), './{0}/Rerun{0}/list.txt'.format(subdir))
         shutil.copy('./{0}/{1}'.format(subdir, pdbname), './{0}/Rerun{0}/{1}'.format(subdir, pdbname))
@@ -274,19 +276,13 @@ for subdir in subdir_list:
         #add lines to todolist
         todolist.append('cd {0}/Rerun{0}/\n'.format(subdir))
         todolist.append('{0} --command=BuildModel --pdb={1}  --mutant-file=individual_list.txt '
-                        '--numberOfRuns=5 > LOG&\n'.format(execloc, pdbname))
+                        '--numberOfRuns=5 {} > LOG&\n'.format(execloc, pdbname, ' '.join(FXFLAGS)))
         todolist.append('cd ../..\n')
 
     #if rosetta, copy or create all files required for a rerun in new directory
     if fx_or_ro == 'ro':
         #make backup of original output file 
         shutil.copy('./{0}/ddg_predictions.out'.format(subdir), './{0}/ddg_predictions_backup.out'.format(subdir))
-        #read pdb name from LOG file to make sure that was the one used in the previous calculation
-        if not os.path.exists('./{0}/LOG'.format(subdir)):
-            print('Tried to read pdb from LOG file, but no LOG file was found')
-            print('\n')
-            continue
-        pdbname = ReadFile('./{0}/LOG'.format(subdir))[2].split()[-3]
         print('Found pdb in LOG file: {0}'.format(pdbname))
         shutil.copy('./{0}/FLAGrow3'.format(subdir), './{0}/Rerun{0}/FLAGrow3'.format(subdir))
         shutil.copy('./{0}/{1}'.format(subdir, pdbname), './{0}/Rerun{0}/{1}'.format(subdir, pdbname))
@@ -303,7 +299,7 @@ for subdir in subdir_list:
         #add lines to todolist
         todolist.append('cd {0}/Rerun{0}/\n'.format(subdir))
         todolist.append('{0} @FLAGrow3 -in:file:s {1} -ddg::mut_file '
-                        'RosettaFormatMutations.mut >LOG&\n'.format(execloc, pdbname))
+                        'RosettaFormatMutations.mut {2} >LOG&\n'.format(execloc, pdbname, ' '.join(ROFLAGS)))
         todolist.append('cd ../..\n')
     
     #for clarity, print whiteline between each directory
