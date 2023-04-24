@@ -9,7 +9,7 @@ Simply copy the script into the directory where the original `todolist` script i
 This should look something like this:
 
 ```
-python3 restartFRESCO.py ~/frescoSoft/foldx5mac/foldx_20221231
+python3 restartFRESCO.py MyPrecious.pdb ~/frescoSoft/foldx5mac/foldx_20221231
 ```
 
 The script generates a small bash script called `todolistRerun` which reruns the energy calculations for the missing mutations.
