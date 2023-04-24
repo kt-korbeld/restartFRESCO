@@ -16,9 +16,9 @@ The script generates a small bash script called `todolistRerun` which reruns the
 This new script should be run in the background by running:
 
 ```
-./todolistRestart &
+./todolistRerun &
 ```
-Or run with a jobscript when working on the Peregrine cluster. The script will automatically append the results of the rerun to the original output files, and the pdbs back to the original directory. It only appends the output files used by the DistributeRosetta/Foldx Phase2 scripts, but not, in the case of Foldx, the Raw_...fxout or Pdblist_...fxout files. 
+Or run with a jobscript when working on the Peregrine cluster. The script will automatically append the results of the rerun to the original output files, and copy the .pdb files back to the original directory. It only appends the output files used by the DistributeRosetta/Foldx Phase2 scripts, but not, in the case of Foldx, the Raw_...fxout or Pdblist_...fxout files. 
 
 The appending of the original files at the end is automatically done by the python script. The bash script calls the python script to do this once the calculations have finished. This appending step affects the original files, so if you are cautious and want to guarantee that the rerun was succesful before appending, you can turn this off by changing the variable `AUTOMATIC` to False in the script. The appending can then be run seperately by using:
 ```
